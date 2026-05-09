@@ -1,0 +1,15 @@
+{
+  "name": "desafio-plansul",
+  "version": "1.0.0",
+  "description": "Pipeline de automação de faturamento hospitalar",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {}
+}
