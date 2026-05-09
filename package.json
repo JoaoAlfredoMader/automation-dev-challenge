@@ -12,7 +12,9 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "csv-parser": "^3.2.1",
     "dotenv": "^17.4.2",
+    "exceljs": "^4.4.0",
     "winston": "^3.19.0"
   }
 }
