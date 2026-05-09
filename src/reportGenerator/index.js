@@ -187,10 +187,42 @@ async function generateReport(outputDir, consolidated, divergences, stats, pdfRe
     col.width = 25;
   });
 
-  await workbook.xlsx.writeFile(filePath);
-  logger.info(`Relatório gerado com sucesso: ${filePath}`);
-  
-  return filePath;
+  // Tenta escrever o arquivo com retry em caso de EBUSY (arquivo aberto no Excel)
+  const maxRetries = 3;
+  const delayMs = 1000;
+  let lastError;
+
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      await workbook.xlsx.writeFile(filePath);
+      logger.info(`Relatório gerado com sucesso: ${filePath}`);
+      return filePath;
+    } catch (error) {
+      lastError = error;
+      if (error.code === 'EBUSY' || error.code === 'EPERM') {
+        logger.warn(`Arquivo bloqueado (tentativa ${attempt}/${maxRetries}): ${filePath}`);
+        if (attempt < maxRetries) {
+          await new Promise(resolve => setTimeout(resolve, delayMs));
+        }
+      } else {
+        throw error;
+      }
+    }
+  }
+
+  // Se todas as tentativas falharam, gera com nome alternativo (timestamp)
+  const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+  const altFileName = `relatorio_faturamento_${monthYear}_${timestamp}.xlsx`;
+  const altFilePath = path.join(outputDir, altFileName);
+
+  try {
+    await workbook.xlsx.writeFile(altFilePath);
+    logger.info(`Relatório gerado com nome alternativo: ${altFilePath}`);
+    return altFilePath;
+  } catch (altError) {
+    logger.error(`Falha ao gerar relatório: ${lastError.message}`);
+    throw lastError;
+  }
 }
 
 module.exports = { generateReport };
