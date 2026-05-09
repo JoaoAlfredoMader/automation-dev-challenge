@@ -11,5 +11,8 @@
   "author": "",
   "license": "ISC",
   "type": "commonjs",
-  "dependencies": {}
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "winston": "^3.19.0"
+  }
 }
