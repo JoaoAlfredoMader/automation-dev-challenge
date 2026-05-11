@@ -37,3 +37,8 @@ output/
 # OS
 .DS_Store
 Thumbs.db
+
+# Web UI runtime files
+web/config.json
+web/logs/
+web/data-backup/
