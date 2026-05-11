@@ -186,11 +186,22 @@ async function runPipelineJob() {
     config.lastRunStatus = results.success ? 'success' : 'error';
     if (results.error) config.lastRunError = results.error;
     else delete config.lastRunError;
+    // Status real do envio de e-mail
+    if (results.emailResult) {
+      config.lastEmailSent = results.emailResult.sent;
+      if (results.emailResult.reason) config.lastEmailError = results.emailResult.reason;
+      else delete config.lastEmailError;
+    } else {
+      delete config.lastEmailSent;
+      delete config.lastEmailError;
+    }
     await saveConfig(config);
     return results;
   } catch (e) {
     config.lastRunStatus = 'error';
     config.lastRunError = e.message;
+    delete config.lastEmailSent;
+    delete config.lastEmailError;
     await saveConfig(config);
     return { success: false, error: e.message };
   } finally {
@@ -223,6 +234,8 @@ app.get('/api/status', async (req, res) => {
     lastRun: config.lastRun,
     lastRunStatus: config.lastRunStatus,
     lastRunError: config.lastRunError,
+    lastEmailSent: config.lastEmailSent,
+    lastEmailError: config.lastEmailError,
     reports: outputFiles.sort((a, b) => new Date(b.date) - new Date(a.date)),
   });
 });

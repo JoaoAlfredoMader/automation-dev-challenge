@@ -31,11 +31,6 @@
           Logs
         </a>
       </nav>
-      <div class="sidebar-footer">
-        <button id="btn-run-now" class="btn btn-primary btn-full">
-          Executar Agora
-        </button>
-      </div>
     </aside>
 
     <!-- Main Content -->
@@ -43,7 +38,10 @@
       <!-- Header -->
       <header class="header">
         <h2 id="page-title">Dashboard</h2>
-        <div class="header-status">
+        <div class="header-actions">
+          <button id="btn-run-now" class="btn btn-primary">
+            Executar Pipeline
+          </button>
           <span class="badge" id="cron-status">Agendamento: 06:30 seg</span>
         </div>
       </header>
@@ -53,29 +51,25 @@
         <!-- DASHBOARD -->
         <section id="page-dashboard" class="page active">
           <div class="cards-grid">
-            <div class="card card-blue">
-              <div class="card-icon"></div>
+            <div class="card card-neutral">
               <div class="card-info">
                 <h3>Total de Cobranças</h3>
                 <p class="card-value" id="dash-total">-</p>
               </div>
             </div>
-            <div class="card card-green">
-              <div class="card-icon"></div>
+            <div class="card card-neutral">
               <div class="card-info">
                 <h3>Em Ambas as Fontes</h3>
                 <p class="card-value" id="dash-both">-</p>
               </div>
             </div>
-            <div class="card card-red">
-              <div class="card-icon"></div>
+            <div class="card card-neutral">
               <div class="card-info">
                 <h3>Com Divergências</h3>
                 <p class="card-value" id="dash-divergences">-</p>
               </div>
             </div>
-            <div class="card card-purple">
-              <div class="card-icon"></div>
+            <div class="card card-neutral">
               <div class="card-info">
                 <h3>Valor Líquido</h3>
                 <p class="card-value" id="dash-liquido">-</p>

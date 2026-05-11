@@ -99,6 +99,12 @@ body {
 
 .header h2 { font-size: 22px; font-weight: 600; }
 
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 .badge {
   background: var(--bg);
   padding: 6px 14px;
@@ -136,10 +142,7 @@ body {
   border-left: 4px solid;
 }
 
-.card-blue { border-color: var(--primary); }
-.card-green { border-color: var(--success); }
-.card-red { border-color: var(--danger); }
-.card-purple { border-color: var(--purple); }
+.card-neutral { border-color: var(--border); }
 
 .card-icon { font-size: 32px; }
 .card-info h3 { font-size: 13px; color: var(--text-light); font-weight: 500; }

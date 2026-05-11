@@ -23,6 +23,15 @@ function formatDate(dateStr) {
   return d.toLocaleString('pt-BR');
 }
 
+function translateStatus(status) {
+  const map = {
+    success: 'Sucesso',
+    error: 'Erro',
+    running: 'Executando',
+  };
+  return map[status] || status || '-';
+}
+
 // ===================== NAVIGATION =====================
 
 const navLinks = document.querySelectorAll('.nav-link');
@@ -81,7 +90,7 @@ async function loadDashboard() {
       : 'Nunca executado';
     
     const statusEl = document.getElementById('dash-last-status');
-    statusEl.textContent = status.lastRunStatus || '-';
+    statusEl.textContent = translateStatus(status.lastRunStatus);
     statusEl.className = status.lastRunStatus === 'success' ? 'text-success' : 
                          status.lastRunStatus === 'error' ? 'text-error' : '';
     
@@ -93,9 +102,18 @@ async function loadDashboard() {
       errorRow.style.display = 'none';
     }
     
-    document.getElementById('dash-email-status').textContent = 
-      status.lastRunStatus === 'success' ? 'Enviado' : 
-      status.lastRunStatus === 'error' ? 'Falhou' : '-';
+    // Status real do e-mail (não assume enviado só porque o pipeline deu sucesso)
+    const emailStatusEl = document.getElementById('dash-email-status');
+    if (status.lastEmailSent === true) {
+      emailStatusEl.textContent = 'Enviado';
+      emailStatusEl.className = 'text-success';
+    } else if (status.lastEmailSent === false) {
+      emailStatusEl.textContent = status.lastEmailError || 'Não enviado (SMTP não configurado)';
+      emailStatusEl.className = 'text-error';
+    } else {
+      emailStatusEl.textContent = '-';
+      emailStatusEl.className = '';
+    }
     
     // Cron badge
     const cronBadge = document.getElementById('cron-status');
