@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pipeline de Faturamento - Painel de Controle</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="app">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="logo">
+        <h1>Pipeline</h1>
+        <span>Faturamento Hospitalar</span>
+      </div>
+      <nav class="nav">
+        <a href="#dashboard" class="nav-link active" data-page="dashboard">
+          Dashboard
+        </a>
+        <a href="#files" class="nav-link" data-page="files">
+          Arquivos
+        </a>
+        <a href="#config" class="nav-link" data-page="config">
+          Configurações
+        </a>
+        <a href="#reports" class="nav-link" data-page="reports">
+          Relatórios
+        </a>
+        <a href="#logs" class="nav-link" data-page="logs">
+          Logs
+        </a>
+      </nav>
+      <div class="sidebar-footer">
+        <button id="btn-run-now" class="btn btn-primary btn-full">
+          Executar Agora
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main">
+      <!-- Header -->
+      <header class="header">
+        <h2 id="page-title">Dashboard</h2>
+        <div class="header-status">
+          <span class="badge" id="cron-status">Agendamento: 06:30 seg</span>
+        </div>
+      </header>
+
+      <!-- Pages -->
+      <div class="content">
+        <!-- DASHBOARD -->
+        <section id="page-dashboard" class="page active">
+          <div class="cards-grid">
+            <div class="card card-blue">
+              <div class="card-icon"></div>
+              <div class="card-info">
+                <h3>Total de Cobranças</h3>
+                <p class="card-value" id="dash-total">-</p>
+              </div>
+            </div>
+            <div class="card card-green">
+              <div class="card-icon"></div>
+              <div class="card-info">
+                <h3>Em Ambas as Fontes</h3>
+                <p class="card-value" id="dash-both">-</p>
+              </div>
+            </div>
+            <div class="card card-red">
+              <div class="card-icon"></div>
+              <div class="card-info">
+                <h3>Com Divergências</h3>
+                <p class="card-value" id="dash-divergences">-</p>
+              </div>
+            </div>
+            <div class="card card-purple">
+              <div class="card-icon"></div>
+              <div class="card-info">
+                <h3>Valor Líquido</h3>
+                <p class="card-value" id="dash-liquido">-</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h3>Última Execução</h3>
+            <div class="info-row">
+              <span>Data/Hora:</span>
+              <strong id="dash-last-run">Nunca executado</strong>
+            </div>
+            <div class="info-row">
+              <span>Status:</span>
+              <strong id="dash-last-status">-</strong>
+            </div>
+            <div class="info-row" id="dash-error-row" style="display:none">
+              <span>Erro:</span>
+              <strong id="dash-last-error" class="text-error"></strong>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h3>Último E-mail Enviado</h3>
+            <div class="info-row">
+              <span>Status:</span>
+              <strong id="dash-email-status">-</strong>
+            </div>
+          </div>
+        </section>
+
+        <!-- FILES -->
+        <section id="page-files" class="page">
+          <div class="panel">
+            <div class="panel-header">
+              <h3>Arquivos de Entrada (data/)</h3>
+              <div class="panel-actions">
+                <button class="btn btn-secondary" id="btn-restore-files">
+                  Restaurar Padrão
+                </button>
+                <label class="btn btn-primary">
+                  Importar Arquivo
+                  <input type="file" id="file-upload" hidden>
+                </label>
+              </div>
+            </div>
+            <p class="hint">Os arquivos padrão são mantidos como backup. Você pode remover os importados e restaurar os originais a qualquer momento.</p>
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Nome</th>
+                  <th>Tipo</th>
+                  <th>Tamanho</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="files-table-body">
+                <tr><td colspan="4" class="text-center">Carregando...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- CONFIG -->
+        <section id="page-config" class="page">
+          <div class="panel">
+            <h3>Agendamento Automático (Cron)</h3>
+            <div class="form-row">
+              <label class="form-label">
+                <input type="checkbox" id="cron-enabled" checked>
+                Ativar execução automática
+              </label>
+            </div>
+            <div class="form-row inline">
+              <div class="form-group">
+                <label>Hora</label>
+                <input type="number" id="cron-hour" min="0" max="23" value="6" class="form-input">
+              </div>
+              <div class="form-group">
+                <label>Minuto</label>
+                <input type="number" id="cron-minute" min="0" max="59" value="30" class="form-input">
+              </div>
+              <div class="form-group">
+                <label>Dia da Semana</label>
+                <select id="cron-day" class="form-input">
+                  <option value="1">Segunda-feira</option>
+                  <option value="2">Terça-feira</option>
+                  <option value="3">Quarta-feira</option>
+                  <option value="4">Quinta-feira</option>
+                  <option value="5">Sexta-feira</option>
+                  <option value="6">Sábado</option>
+                  <option value="0">Domingo</option>
+                  <option value="*">Todos os dias</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h3>Configuração de E-mail (SMTP)</h3>
+            <div class="form-row">
+              <label class="form-label">Servidor SMTP</label>
+              <input type="text" id="env-smtp-host" class="form-input" placeholder="sandbox.smtp.mailtrap.io">
+            </div>
+            <div class="form-row inline">
+              <div class="form-group">
+                <label>Porta</label>
+                <input type="text" id="env-smtp-port" class="form-input" placeholder="2525">
+              </div>
+              <div class="form-group">
+                <label>Usuário SMTP</label>
+                <input type="text" id="env-smtp-user" class="form-input">
+              </div>
+              <div class="form-group">
+                <label>Senha SMTP</label>
+                <input type="password" id="env-smtp-pass" class="form-input">
+              </div>
+            </div>
+            <div class="form-row inline">
+              <div class="form-group">
+                <label>E-mail Remetente</label>
+                <input type="email" id="env-email-from" class="form-input" placeholder="pipeline@desafio-plansul.com">
+              </div>
+              <div class="form-group">
+                <label>E-mail Destinatário</label>
+                <input type="email" id="env-email-to" class="form-input" placeholder="gestor@empresa.com">
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h3>Diretórios</h3>
+            <div class="form-row inline">
+              <div class="form-group">
+                <label>Dados</label>
+                <input type="text" id="env-data-dir" class="form-input" value="./data" readonly>
+              </div>
+              <div class="form-group">
+                <label>Output</label>
+                <input type="text" id="env-output-dir" class="form-input" value="./output" readonly>
+              </div>
+              <div class="form-group">
+                <label>Logs</label>
+                <input type="text" id="env-logs-dir" class="form-input" value="./logs" readonly>
+              </div>
+            </div>
+          </div>
+
+          <button class="btn btn-primary btn-large" id="btn-save-config">
+            Salvar Configurações
+          </button>
+        </section>
+
+        <!-- REPORTS -->
+        <section id="page-reports" class="page">
+          <div class="panel">
+            <div class="panel-header">
+              <h3>Relatórios Gerados</h3>
+            </div>
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Nome</th>
+                  <th>Tamanho</th>
+                  <th>Data</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="reports-table-body">
+                <tr><td colspan="4" class="text-center">Nenhum relatório gerado ainda</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- LOGS -->
+        <section id="page-logs" class="page">
+          <div class="panel">
+            <div class="panel-header">
+              <h3>Arquivos de Log</h3>
+            </div>
+            <div class="log-list" id="logs-list">
+              <p class="text-center">Nenhum log encontrado</p>
+            </div>
+          </div>
+          <div class="panel" id="log-viewer" style="display:none">
+            <div class="panel-header">
+              <h3 id="log-viewer-title">Conteúdo do Log</h3>
+              <button class="btn btn-secondary" id="btn-close-log">Fechar</button>
+            </div>
+            <pre class="log-content" id="log-content"></pre>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <!-- Toast notifications -->
+  <div id="toast-container"></div>
+
+  <script src="/js/app.js"></script>
+</body>
+</html>
