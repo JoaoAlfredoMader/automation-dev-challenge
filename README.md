@@ -45,6 +45,26 @@ node src/index.js
 
 As pastas `output/` e `logs/` são criadas automaticamente e **não são versionadas**.
 
+## Interface Web (Opcional)
+
+Painel de controle para executar o pipeline, gerenciar arquivos, configurar cron e visualizar relatórios.
+
+```bash
+cd web
+npm install
+npm start
+```
+
+Acesse em `http://localhost:3000`.
+
+Funcionalidades:
+- Dashboard com resumo da última execução
+- Execução manual do pipeline
+- Configuração de cron e SMTP via interface
+- Upload/restauração de arquivos de entrada
+- Download de relatórios gerados
+- Visualização de logs
+
 ## Estrutura
 
 - `src/readers/` — leitura de Excel e CSV
@@ -52,4 +72,6 @@ As pastas `output/` e `logs/` são criadas automaticamente e **não são version
 - `src/pdfProcessor/` — renomeação de PDFs
 - `src/reportGenerator/` — geração do Excel
 - `src/emailSender/` — envio de e-mail (opcional)
+- `src/pipeline.js` — orquestração do pipeline (reutilizável por CLI e web)
 - `data/` — arquivos de entrada
+- `web/` — interface web de controle
