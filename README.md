@@ -16,9 +16,39 @@ cd automation-dev-challenge
 npm install
 ```
 
-## Execução do Pipeline (CLI)
+## Como Executar
 
-O pipeline roda **sem necessidade de configuração adicional**. Basta executar:
+O projeto pode ser usado de **duas formas**: via interface web (recomendado para testes e controle visual) ou via linha de comando (para automação e cron).
+
+### Opção 1: Interface Web (Recomendado)
+
+```bash
+cd web
+npm install
+npm start
+```
+
+Acesse em: **http://localhost:3000**
+
+**Funcionalidades:**
+- Dashboard com resumo da última execução
+- Botão para executar o pipeline manualmente
+- Configuração de cron e SMTP via interface
+- Upload/restauração de arquivos de entrada
+- Download de relatórios gerados
+- Visualização de logs
+
+**Primeiro uso:**
+1. Acesse `http://localhost:3000`
+2. Vá em **Configurações**
+3. Ative o cron e defina horário desejado (padrão: 06:30 seg)
+4. (Opcional) Preencha credenciais SMTP para habilitar e-mail
+5. Clique em **Salvar Configurações**
+6. No Dashboard, clique em **Executar Pipeline** para testar
+
+### Opção 2: Linha de Comando (CLI)
+
+O pipeline roda **sem necessidade de configuração adicional**:
 
 ```bash
 npm start
@@ -30,11 +60,19 @@ Ou, caso o PowerShell bloqueie o npm:
 node src/index.js
 ```
 
-### Comportamento sem configuração de e-mail
-
+**Comportamento sem configuração de e-mail:**
 Se o arquivo `.env` não existir ou não tiver credenciais SMTP preenchidas, o pipeline executa normalmente e **pula o envio de e-mail** com um aviso no log. O relatório Excel e os PDFs renomeados ainda são gerados.
 
-### Para habilitar envio de e-mail
+**Exemplo de saída:**
+```
+Total de cobranças: 197
+Cobranças em ambas as fontes: 191
+Cobranças apenas no CSV: 6
+Cobranças com divergências: 102
+Valor líquido total: R$ 116360.00
+```
+
+### Para habilitar envio de e-mail (qualquer modo)
 
 ```bash
 cp .env.example .env
@@ -61,18 +99,6 @@ EMAIL_TO=gestor@empresa.com
 
 As pastas `output/` e `logs/` são criadas automaticamente e **não são versionadas** no Git.
 
-### Exemplo de saída no terminal
-
-```
-Total de cobranças: 197
-Cobranças em ambas as fontes: 191
-Cobranças apenas no CSV: 6
-Cobranças com divergências: 102
-Valor líquido total: R$ 116360.00
-PDFs renomeados: 34
-PDFs não identificados: 216
-```
-
 ## Agendamento com Cron (Linux/macOS)
 
 O repositório inclui o script `run.sh` pronto para agendamento:
@@ -89,38 +115,6 @@ Exemplo de entrada no crontab (segunda-feira às 06:30):
 ```
 
 O script retorna **exit code 1** em caso de erro, conforme exigido.
-
-## Interface Web de Controle
-
-Painel completo para gerenciar o pipeline via browser.
-
-### Instalação e execução
-
-```bash
-cd web
-npm install
-npm start
-```
-
-Acesse em: **http://localhost:3000**
-
-### Funcionalidades
-
-- **Dashboard** — resumo da última execução, status, totais financeiros
-- **Executar Pipeline** — botão para rodar o pipeline manualmente
-- **Configurações** — editor de cron (hora, dia da semana) e credenciais SMTP
-- **Arquivos** — upload de novos arquivos de entrada, exclusão e restauração dos originais
-- **Relatórios** — lista de relatórios gerados com download
-- **Logs** — visualização dos arquivos de log em tempo real
-
-### Primeiro uso da interface web
-
-1. Acesse `http://localhost:3000`
-2. Vá em **Configurações**
-3. Ative o cron e defina horário desejado (padrão: 06:30 seg)
-4. (Opcional) Preencha credenciais SMTP para habilitar e-mail
-5. Clique em **Salvar Configurações**
-6. No Dashboard, clique em **Executar Agora** para testar
 
 ## Estrutura do Projeto
 
