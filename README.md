@@ -8,6 +8,8 @@ Sistema que consolida cobranças de planos de saúde a partir de arquivos Excel 
 - npm (instalado com o Node.js)
 - Git
 
+> **PowerShell no Windows:** O projeto já inclui configuração para rodar `npm` no PowerShell sem erros de execução de scripts. Basta usar os comandos `npm install` e `npm start` normalmente.
+
 ## Instalação Rápida
 
 ```bash
