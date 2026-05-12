@@ -313,6 +313,15 @@ body {
   to { transform: translateX(0); opacity: 1; }
 }
 
+/* Links de pasta */
+.link-folder {
+  color: var(--primary);
+  text-decoration: none;
+}
+.link-folder:hover {
+  text-decoration: underline;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .sidebar { width: 70px; }

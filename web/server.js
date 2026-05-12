@@ -23,16 +23,18 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Multer config
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, DATA_DIR);
-  },
-  filename: (req, file, cb) => {
-    cb(null, file.originalname);
-  }
-});
-const upload = multer({ storage });
+// Multer config (dinâmico por diretório)
+function getUploadStorage(destDir) {
+  return multer.diskStorage({
+    destination: (req, file, cb) => {
+      cb(null, destDir);
+    },
+    filename: (req, file, cb) => {
+      cb(null, file.originalname);
+    }
+  });
+}
+const defaultUpload = multer({ storage: getUploadStorage(DATA_DIR) });
 
 // ===================== HELPERS =====================
 
@@ -273,25 +275,31 @@ app.post('/api/config', async (req, res) => {
 // Files
 app.get('/api/files', async (req, res) => {
   const files = [];
+  const subDir = req.query.dir || '';
+  const targetDir = subDir ? path.join(DATA_DIR, subDir) : DATA_DIR;
+  
+  // Segurança: impedir path traversal
+  if (!targetDir.startsWith(DATA_DIR)) {
+    return res.status(403).json({ error: 'Acesso negado' });
+  }
+  
   try {
-    const entries = await fs.readdir(DATA_DIR, { withFileTypes: true });
+    const entries = await fs.readdir(targetDir, { withFileTypes: true });
     for (const entry of entries) {
       if (entry.isFile()) {
-        const stat = await fs.stat(path.join(DATA_DIR, entry.name));
+        const stat = await fs.stat(path.join(targetDir, entry.name));
         files.push({
           name: entry.name,
           size: stat.size,
           modified: stat.mtime,
           type: 'file',
-          isDefault: false, // could check against backup
         });
       } else if (entry.isDirectory()) {
-        const subFiles = await fs.readdir(path.join(DATA_DIR, entry.name));
+        const subFiles = await fs.readdir(path.join(targetDir, entry.name));
         files.push({
           name: entry.name,
           type: 'directory',
           count: subFiles.length,
-          isDefault: false,
         });
       }
     }
@@ -301,13 +309,31 @@ app.get('/api/files', async (req, res) => {
   res.json(files);
 });
 
-app.post('/api/files/upload', upload.single('file'), (req, res) => {
-  if (!req.file) return res.status(400).json({ error: 'Nenhum arquivo enviado' });
-  res.json({ message: 'Arquivo enviado', file: req.file.originalname });
+app.post('/api/files/upload', (req, res) => {
+  const subDir = req.query.dir || '';
+  const destDir = subDir ? path.join(DATA_DIR, subDir) : DATA_DIR;
+  
+  // Segurança
+  if (!destDir.startsWith(DATA_DIR)) {
+    return res.status(403).json({ error: 'Acesso negado' });
+  }
+  
+  const uploadHandler = multer({ storage: getUploadStorage(destDir) }).single('file');
+  uploadHandler(req, res, (err) => {
+    if (err || !req.file) return res.status(400).json({ error: 'Nenhum arquivo enviado' });
+    res.json({ message: 'Arquivo enviado', file: req.file.originalname });
+  });
 });
 
 app.delete('/api/files/:name', async (req, res) => {
-  const filePath = path.join(DATA_DIR, req.params.name);
+  const subDir = req.query.dir || '';
+  const filePath = path.join(DATA_DIR, subDir, req.params.name);
+  
+  // Segurança
+  if (!filePath.startsWith(DATA_DIR)) {
+    return res.status(403).json({ error: 'Acesso negado' });
+  }
+  
   try {
     await fs.unlink(filePath);
     res.json({ message: 'Arquivo removido' });

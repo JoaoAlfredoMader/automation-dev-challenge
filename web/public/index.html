@@ -79,8 +79,11 @@
         <section id="page-files" class="page">
           <div class="panel">
             <div class="panel-header">
-              <h3>Arquivos de Entrada (data/)</h3>
+              <h3 id="files-title">Arquivos de Entrada (data/)</h3>
               <div class="panel-actions">
+                <button class="btn btn-secondary" id="btn-files-back" style="display:none">
+                  Voltar
+                </button>
                 <button class="btn btn-secondary" id="btn-restore-files">
                   Restaurar Padrão
                 </button>
@@ -90,7 +93,7 @@
                 </label>
               </div>
             </div>
-            <p class="hint">Os arquivos padrão são mantidos como backup. Você pode remover os importados e restaurar os originais a qualquer momento.</p>
+            <p class="hint" id="files-breadcrumb">data/</p>
             <table class="table">
               <thead>
                 <tr>

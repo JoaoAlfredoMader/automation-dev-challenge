@@ -133,12 +133,23 @@ async function loadDashboard() {
 
 // ===================== FILES =====================
 
+let currentDir = ''; // diretório atual relativo a data/
+
+function updateFilesUI() {
+  const title = currentDir ? `Arquivos de Entrada (data/${currentDir})` : 'Arquivos de Entrada (data/)';
+  document.getElementById('files-title').textContent = title;
+  document.getElementById('files-breadcrumb').textContent = 'data/' + (currentDir || '');
+  document.getElementById('btn-files-back').style.display = currentDir ? 'inline-flex' : 'none';
+}
+
 async function loadFiles() {
+  updateFilesUI();
   const tbody = document.getElementById('files-table-body');
   tbody.innerHTML = '<tr><td colspan="4" class="text-center">Carregando...</td></tr>';
   
   try {
-    const files = await api('/files');
+    const query = currentDir ? `?dir=${encodeURIComponent(currentDir)}` : '';
+    const files = await api(`/files${query}`);
     
     if (files.length === 0) {
       tbody.innerHTML = '<tr><td colspan="4" class="text-center">Nenhum arquivo encontrado</td></tr>';
@@ -147,15 +158,18 @@ async function loadFiles() {
     
     tbody.innerHTML = files.map(f => `
       <tr>
-        <td><strong>${f.name}</strong></td>
+        <td>
+          ${f.type === 'directory'
+            ? `<a href="#" class="link-folder" onclick="openDirectory('${f.name}'); return false;"><strong>${f.name}/</strong></a>`
+            : `<strong>${f.name}</strong>`
+          }
+        </td>
         <td>${f.type === 'directory' ? 'Pasta' : 'Arquivo'}</td>
         <td>${f.type === 'directory' ? f.count + ' itens' : formatBytes(f.size)}</td>
         <td>
-          ${f.type !== 'directory' ? `
-            <button class="btn btn-danger btn-sm" onclick="deleteFile('${f.name}')">
-              Remover
-            </button>
-          ` : ''}
+          <button class="btn btn-danger btn-sm" onclick="deleteFile('${f.name}')">
+            Remover
+          </button>
         </td>
       </tr>
     `).join('');
@@ -164,11 +178,25 @@ async function loadFiles() {
   }
 }
 
+function openDirectory(name) {
+  currentDir = currentDir ? `${currentDir}/${name}` : name;
+  loadFiles();
+}
+
+function goBack() {
+  if (!currentDir) return;
+  const parts = currentDir.split('/');
+  parts.pop();
+  currentDir = parts.join('/');
+  loadFiles();
+}
+
 async function deleteFile(name) {
-  if (!confirm(`Remover o arquivo "${name}"?`)) return;
+  if (!confirm(`Remover "${name}"?`)) return;
   try {
-    await api(`/files/${encodeURIComponent(name)}`, { method: 'DELETE' });
-    showToast(`Arquivo "${name}" removido`, 'success');
+    const query = currentDir ? `?dir=${encodeURIComponent(currentDir)}` : '';
+    await api(`/files/${encodeURIComponent(name)}${query}`, { method: 'DELETE' });
+    showToast(`"${name}" removido`, 'success');
     loadFiles();
   } catch (e) {
     showToast(e.message, 'error');
@@ -184,13 +212,14 @@ document.getElementById('file-upload').addEventListener('change', async (e) => {
   formData.append('file', file);
   
   try {
-    const res = await fetch('/api/files/upload', {
+    const query = currentDir ? `?dir=${encodeURIComponent(currentDir)}` : '';
+    const res = await fetch(`/api/files/upload${query}`, {
       method: 'POST',
       body: formData,
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error);
-    showToast(`Arquivo "${file.name}" importado com sucesso`, 'success');
+    showToast(`"${file.name}" importado com sucesso`, 'success');
     loadFiles();
   } catch (e) {
     showToast(e.message, 'error');
@@ -199,11 +228,15 @@ document.getElementById('file-upload').addEventListener('change', async (e) => {
   e.target.value = '';
 });
 
+// Back button
+document.getElementById('btn-files-back').addEventListener('click', goBack);
+
 // Restore default
 document.getElementById('btn-restore-files').addEventListener('click', async () => {
   if (!confirm('Restaurar todos os arquivos para o padrão original?\nIsso removerá os arquivos importados.')) return;
   try {
     await api('/files/restore', { method: 'POST' });
+    currentDir = '';
     showToast('Arquivos padrão restaurados', 'success');
     loadFiles();
   } catch (e) {
