@@ -126,12 +126,6 @@ async function loadDashboard() {
     } else {
       cronBadge.textContent = 'Agendamento desativado';
     }
-    
-    // If we have reports, get stats from the latest
-    if (status.reports && status.reports.length > 0) {
-      // We don't have stats in status API, so just show report count
-      document.getElementById('dash-total').textContent = status.reports.length + ' relatórios';
-    }
   } catch (e) {
     console.error('Dashboard error:', e);
   }
