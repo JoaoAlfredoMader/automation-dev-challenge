@@ -167,9 +167,11 @@ async function loadFiles() {
         <td>${f.type === 'directory' ? 'Pasta' : 'Arquivo'}</td>
         <td>${f.type === 'directory' ? f.count + ' itens' : formatBytes(f.size)}</td>
         <td>
-          <button class="btn btn-danger btn-sm" onclick="deleteFile('${f.name}')">
-            Remover
-          </button>
+          ${!(f.type === 'directory' && f.name === 'laudos') ? `
+            <button class="btn btn-danger btn-sm" onclick="deleteFile('${f.name}')">
+              Remover
+            </button>
+          ` : '<span class="text-light">—</span>'}
         </td>
       </tr>
     `).join('');

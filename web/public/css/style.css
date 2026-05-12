@@ -285,6 +285,7 @@ body {
 /* Text utils */
 .text-center { text-align: center; }
 .text-error { color: var(--danger); }
+.text-light { color: var(--text-light); }
 
 /* Toast */
 #toast-container {
